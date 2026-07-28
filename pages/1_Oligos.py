@@ -76,6 +76,36 @@ if st.session_state.oligo_update_mode and hasattr(st.session_state, 'oligo_dataf
                 # Reset update mode to show Add form on next render
                 st.session_state.oligo_update_mode = False
                 st.rerun()
+    
+    # Delete button
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        if st.button("🗑️ Delete", key=f"delete_oligo_{primer_key}"):
+            # Initialize confirmation state
+            if "delete_oligo_confirm" not in st.session_state:
+                st.session_state.delete_oligo_confirm = False
+            st.session_state.delete_oligo_confirm = True
+    
+    # Show confirmation dialog
+    if st.session_state.get("delete_oligo_confirm", False):
+        st.warning(f"⚠️ Are you sure you want to delete this oligo? (Oligo #{int(selected_row['Primer_Number'])} - {selected_row['Primer_Name']})")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✓ Yes, Delete", key=f"confirm_delete_oligo_{primer_key}"):
+                try:
+                    conn.execute("DELETE FROM PRIMERS WHERE Primer_Key = ?", (primer_key,))
+                    conn.commit()
+                    st.success("Oligo deleted successfully!")
+                    st.session_state.oligo_update_mode = False
+                    st.session_state.delete_oligo_confirm = False
+                    st.rerun()
+                except sqlite3.IntegrityError as e:
+                    st.error(f"Cannot delete: {e}")
+                    st.session_state.delete_oligo_confirm = False
+        with col2:
+            if st.button("✗ Cancel", key=f"cancel_delete_oligo_{primer_key}"):
+                st.session_state.delete_oligo_confirm = False
+                st.rerun()
 else:
     try:
         add_oligo(conn)

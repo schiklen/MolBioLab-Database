@@ -70,6 +70,66 @@ if st.session_state.cellbank_update_mode and hasattr(st.session_state, 'cellbank
             # Reset update mode to show Add form on next render
             st.session_state.cellbank_update_mode = False
             st.rerun()
+    
+    # Delete button
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        if st.button("🗑️ Delete", key=f"delete_cellbank_{cellbank_key}"):
+            # Initialize confirmation state
+            if "delete_cellbank_confirm" not in st.session_state:
+                st.session_state.delete_cellbank_confirm = False
+            st.session_state.delete_cellbank_confirm = True
+    
+    # Show confirmation dialog
+    if st.session_state.get("delete_cellbank_confirm", False):
+        st.warning(f"⚠️ Are you sure you want to delete this cellbank? (Cellbank #{int(selected_row['Cellbank_Key'])})")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✓ Yes, Delete", key=f"confirm_delete_cellbank_{cellbank_key}"):
+                try:
+                    conn.execute("DELETE FROM CELLBANKS WHERE Cellbank_Key = ?", (cellbank_key,))
+                    conn.commit()
+                    st.success("Cellbank deleted successfully!")
+                    st.session_state.cellbank_update_mode = False
+                    st.session_state.delete_cellbank_confirm = False
+                    st.rerun()
+                except sqlite3.IntegrityError as e:
+                    st.error(f"Cannot delete: {e}")
+                    st.session_state.delete_cellbank_confirm = False
+        with col2:
+            if st.button("✗ Cancel", key=f"cancel_delete_cellbank_{cellbank_key}"):
+                st.session_state.delete_cellbank_confirm = False
+                st.rerun()
+    
+    # Delete button
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        if st.button("🗑️ Delete", key=f"delete_cellbank_{cellbank_key}"):
+            # Initialize confirmation state
+            if "delete_cellbank_confirm" not in st.session_state:
+                st.session_state.delete_cellbank_confirm = False
+            st.session_state.delete_cellbank_confirm = True
+    
+    # Show confirmation dialog
+    if st.session_state.get("delete_cellbank_confirm", False):
+        st.warning(f"⚠️ Are you sure you want to delete this cellbank? (Cellbank #{int(selected_row['Cellbank_Key'])})")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✓ Yes, Delete", key=f"confirm_delete_cellbank_{cellbank_key}"):
+                try:
+                    conn.execute("DELETE FROM CELLBANKS WHERE Cellbank_Key = ?", (cellbank_key,))
+                    conn.commit()
+                    st.success("Cellbank deleted successfully!")
+                    st.session_state.cellbank_update_mode = False
+                    st.session_state.delete_cellbank_confirm = False
+                    st.rerun()
+                except sqlite3.IntegrityError as e:
+                    st.error(f"Cannot delete: {e}")
+                    st.session_state.delete_cellbank_confirm = False
+        with col2:
+            if st.button("✗ Cancel", key=f"cancel_delete_cellbank_{cellbank_key}"):
+                st.session_state.delete_cellbank_confirm = False
+                st.rerun()
 else:
     try:
         add_cellbank(conn)

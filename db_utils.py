@@ -38,6 +38,17 @@ def get_lookup_options(conn: sqlite3.Connection, table: str, key_col: str, label
     return options
 
 
+def get_next_available_number(conn: sqlite3.Connection, table: str, number_col: str) -> int:
+    """Get the lowest free integer > 1 for a given table and column."""
+    rows = conn.execute(f"SELECT {number_col} FROM {table} ORDER BY {number_col}").fetchall()
+    used_numbers = {row[0] for row in rows if row[0] is not None}
+    
+    next_num = 1
+    while next_num in used_numbers:
+        next_num += 1
+    return next_num
+
+
 def insert_record(conn: sqlite3.Connection, table: str, data: dict) -> None:
     columns = ", ".join(data.keys())
     placeholders = ", ".join(["?" for _ in data])
@@ -84,8 +95,11 @@ def add_oligo(conn: sqlite3.Connection) -> None:
         st.info("Create at least one user first.")
         return
 
+    # Get the next available oligo number
+    next_oligo_number = get_next_available_number(conn, "PRIMERS", "Primer_Number")
+
     with st.form("add_oligo"):
-        primer_number = st.number_input("Oligo Number", min_value=1, step=1)
+        primer_number = st.number_input("Oligo Number", min_value=1, step=1, value=next_oligo_number)
         primer_name = st.text_input("Oligo Name")
         nt_sequence = st.text_area("nt Sequence")
         creator = st.selectbox("Creator", creators, format_func=lambda x: x[1])[0]

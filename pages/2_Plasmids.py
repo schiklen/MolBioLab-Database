@@ -76,6 +76,36 @@ if st.session_state.update_mode and hasattr(st.session_state, 'plasmid_dataframe
                 # Reset update mode to show Add form on next render
                 st.session_state.update_mode = False
                 st.rerun()
+    
+    # Delete button
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        if st.button("🗑️ Delete", key=f"delete_plasmid_{plasmid_key}"):
+            # Initialize confirmation state
+            if "delete_plasmid_confirm" not in st.session_state:
+                st.session_state.delete_plasmid_confirm = False
+            st.session_state.delete_plasmid_confirm = True
+    
+    # Show confirmation dialog
+    if st.session_state.get("delete_plasmid_confirm", False):
+        st.warning(f"⚠️ Are you sure you want to delete this plasmid? (Plasmid #{int(selected_row['Plasmid_Number'])} - {selected_row['Plasmid_Name']})")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✓ Yes, Delete", key=f"confirm_delete_plasmid_{plasmid_key}"):
+                try:
+                    conn.execute("DELETE FROM PLASMIDS WHERE Plasmid_Key = ?", (plasmid_key,))
+                    conn.commit()
+                    st.success("Plasmid deleted successfully!")
+                    st.session_state.update_mode = False
+                    st.session_state.delete_plasmid_confirm = False
+                    st.rerun()
+                except sqlite3.IntegrityError as e:
+                    st.error(f"Cannot delete: {e}")
+                    st.session_state.delete_plasmid_confirm = False
+        with col2:
+            if st.button("✗ Cancel", key=f"cancel_delete_plasmid_{plasmid_key}"):
+                st.session_state.delete_plasmid_confirm = False
+                st.rerun()
 else:
     try:
         add_plasmid(conn)
