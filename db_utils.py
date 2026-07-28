@@ -9,6 +9,45 @@ BASE_DIR = Path(__file__).parent
 DB_PATH = BASE_DIR / "molbio.db"
 SQL_SCHEMA_PATH = BASE_DIR / "create_database.sql"
 
+# SQL Injection protection: whitelist allowed tables and columns
+ALLOWED_TABLES = {
+    "USERS",
+    "PRIMERS",
+    "PLASMIDS",
+    "ECOLI_STRAINS",
+    "CELLBANKS",
+}
+
+ALLOWED_COLUMNS = {
+    # USERS
+    "User_ID",
+    "Name",
+    "Shortcut",
+    "Network_ID",
+    # PRIMERS
+    "Primer_Key",
+    "Primer_Number",
+    "Primer_Name",
+    "nt_Sequence",
+    "Creator",
+    "Date_of_creation",
+    "Comments",
+    # PLASMIDS
+    "Plasmid_Key",
+    "Plasmid_Number",
+    "Plasmid_Name",
+    "Sequence",
+    # ECOLI_STRAINS
+    "Ecoli_Strain_Key",
+    "Ecoli_Strain_Number",
+    "Parent",
+    "Ecoli_Strain_Name",
+    "Genotype",
+    # CELLBANKS
+    "Cellbank_Key",
+    "Strain",
+}
+
 
 @st.cache_resource
 def get_connection() -> sqlite3.Connection:
@@ -29,6 +68,15 @@ def read_df(conn: sqlite3.Connection, query: str, params: tuple = ()) -> pd.Data
 
 
 def get_lookup_options(conn: sqlite3.Connection, table: str, key_col: str, label_cols: list[str]) -> list[tuple[int, str]]:
+    # Validate table and column names against whitelist to prevent SQL injection
+    if table not in ALLOWED_TABLES:
+        raise ValueError(f"Invalid table: {table}")
+    if key_col not in ALLOWED_COLUMNS:
+        raise ValueError(f"Invalid column: {key_col}")
+    for col in label_cols:
+        if col not in ALLOWED_COLUMNS:
+            raise ValueError(f"Invalid column: {col}")
+    
     cols = ", ".join([key_col] + label_cols)
     rows = conn.execute(f"SELECT {cols} FROM {table} ORDER BY {key_col}").fetchall()
     options = []
@@ -40,6 +88,10 @@ def get_lookup_options(conn: sqlite3.Connection, table: str, key_col: str, label
 
 def get_user_shortcuts(conn: sqlite3.Connection) -> list[tuple[int, str]]:
     """Get user options with only shortcut as display label."""
+    # Fixed table/columns, no injection risk, but validated for consistency
+    if "USERS" not in ALLOWED_TABLES or "User_ID" not in ALLOWED_COLUMNS or "Shortcut" not in ALLOWED_COLUMNS:
+        raise ValueError("Invalid table or columns for user shortcuts")
+    
     rows = conn.execute("SELECT User_ID, Shortcut FROM USERS ORDER BY User_ID").fetchall()
     return [(row[0], row[1] if row[1] else f"User {row[0]}") for row in rows]
 
@@ -54,6 +106,12 @@ def validate_iupac_dna(sequence: str) -> bool:
 
 def get_next_available_number(conn: sqlite3.Connection, table: str, number_col: str) -> int:
     """Get the lowest free integer > 1 for a given table and column."""
+    # Validate table and column names against whitelist to prevent SQL injection
+    if table not in ALLOWED_TABLES:
+        raise ValueError(f"Invalid table: {table}")
+    if number_col not in ALLOWED_COLUMNS:
+        raise ValueError(f"Invalid column: {number_col}")
+    
     rows = conn.execute(f"SELECT {number_col} FROM {table} ORDER BY {number_col}").fetchall()
     used_numbers = {row[0] for row in rows if row[0] is not None}
     
