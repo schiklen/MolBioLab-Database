@@ -10,7 +10,16 @@ conn = get_connection()
 initialize_database(conn)
 
 st.subheader("Current Oligos")
-st.dataframe(read_df(conn, "SELECT * FROM PRIMERS ORDER BY Primer_Key DESC"), use_container_width=True)
+df = read_df(conn, """
+    SELECT p.*, u.Shortcut 
+    FROM PRIMERS p 
+    LEFT JOIN USERS u ON p.Creator = u.User_ID 
+    ORDER BY Primer_Key DESC
+""")
+df = df.drop('Creator', axis=1)  # Drop Creator ID
+df = df.rename(columns={'Shortcut': 'Creator'})  # Rename Shortcut to Creator
+df = df.iloc[:, 1:]  # Hide first column (Primer_Key)
+st.dataframe(df, use_container_width=True, selection_mode="rows")
 
 st.divider()
 

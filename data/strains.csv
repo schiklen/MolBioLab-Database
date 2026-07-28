@@ -1,0 +1,4 @@
+Ecoli_Strain_Number,Parent,Ecoli_Strain_Name,Genotype,Creator,Date_of_creation,Comments
+1,,MG1655,F- λ- ilvG- rfb- rph-1,1,2026-07-28,Standard K-12 reference strain (wild-type genome sequenced)
+2,,W3110,F- λ- in(rrnD-rrnE) rph-1,1,2026-07-28,K-12 derivative commonly used for protein expression
+3,,BL21(DE3),F- ompT gal dcm lon hsdS_B(r_B- m_B-) λ(DE3 [lacZ point gene N terminus S7 fusion tag]),1,2026-07-28,Popular expression strain for protein production with T7 RNA polymerase system

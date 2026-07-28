@@ -4,9 +4,9 @@ PRAGMA foreign_keys = ON;
 -- 1. Tabelle: USERS
 CREATE TABLE IF NOT EXISTS USERS (
     User_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT NOT NULL CHECK(length(Name) > 0),
-    Shortcut TEXT,
-    AD_user TEXT
+    Name TEXT NOT NULL UNIQUE CHECK(length(Name) > 0),
+    Shortcut TEXT UNIQUE,
+    Network_ID TEXT -- for active directory integration (optional)
 );
 
 -- 2. Tabelle: PRIMERS (Neu mit Primer_Name)
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS PRIMERS (
     Date_of_creation TEXT, -- ISO8601: YYYY-MM-DD
     Comments TEXT,
     Box INTEGER GENERATED ALWAYS AS (CAST((Primer_Number / 81) AS INT) + 1) STORED,
-    Position INTEGER GENERATED ALWAYS AS ((Primer_Number % 81) + 1) STORED,
+    Position INTEGER GENERATED ALWAYS AS ((Primer_Number % 81)) STORED,
     FOREIGN KEY (Creator) REFERENCES USERS(User_ID)
 );
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS PLASMIDS (
     Date_of_creation TEXT,
     Comments TEXT,
     Box INTEGER GENERATED ALWAYS AS (CAST((Plasmid_Number / 81) AS INT) + 1) STORED,
-    Position INTEGER GENERATED ALWAYS AS ((Plasmid_Number % 81) + 1) STORED,
+    Position INTEGER GENERATED ALWAYS AS ((Plasmid_Number % 81)) STORED,
     FOREIGN KEY (Creator) REFERENCES USERS(User_ID)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS ECOLI_STRAINS (
     Date_of_creation TEXT,
     Comments TEXT,
     Box INTEGER GENERATED ALWAYS AS (CAST((Ecoli_Strain_Number / 81) AS INT) + 1) STORED,
-    Position INTEGER GENERATED ALWAYS AS ((Ecoli_Strain_Number % 81) + 1) STORED,
+    Position INTEGER GENERATED ALWAYS AS ((Ecoli_Strain_Number % 81)) STORED,
     FOREIGN KEY (Parent) REFERENCES ECOLI_STRAINS(Ecoli_Strain_Key),
     FOREIGN KEY (Creator) REFERENCES USERS(User_ID)
 );

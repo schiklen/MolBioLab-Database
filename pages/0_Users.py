@@ -10,7 +10,9 @@ conn = get_connection()
 initialize_database(conn)
 
 st.subheader("Current Users")
-st.dataframe(read_df(conn, "SELECT * FROM USERS ORDER BY User_ID DESC"), use_container_width=True)
+df = read_df(conn, "SELECT * FROM USERS ORDER BY User_ID")
+df = df.iloc[:, 1:]  # Hide first column (User_ID)
+st.dataframe(df, use_container_width=True, selection_mode="rows")
 
 st.divider()
 

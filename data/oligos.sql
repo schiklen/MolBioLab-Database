@@ -1,0 +1,3 @@
+INSERT INTO PRIMERS (Primer_Number, Primer_Name, nt_Sequence, Creator, Date_of_creation, Comments) VALUES (1, 'M13', 'CGCCAGGGTTTTCCCAGTCACGAC', 1, '2026-07-28', 'Standard M13 sequencing primer');
+INSERT INTO PRIMERS (Primer_Number, Primer_Name, nt_Sequence, Creator, Date_of_creation, Comments) VALUES (2, 'M13 rev', 'AGCGGATAACAATTTCACACAGG', 1, '2026-07-28', 'M13 reverse sequencing primer');
+INSERT INTO PRIMERS (Primer_Number, Primer_Name, nt_Sequence, Creator, Date_of_creation, Comments) VALUES (3, 'T7', 'TAATACGACTCACTATA', 1, '2026-07-28', 'T7 RNA polymerase promoter primer');
