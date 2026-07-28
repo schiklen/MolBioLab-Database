@@ -41,8 +41,20 @@ def get_lookup_options(conn: sqlite3.Connection, table: str, key_col: str, label
 def insert_record(conn: sqlite3.Connection, table: str, data: dict) -> None:
     columns = ", ".join(data.keys())
     placeholders = ", ".join(["?" for _ in data])
-    values = tuple(data.values())
+    # Convert all values to native Python types to avoid numpy type issues
+    values = tuple(int(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else v for v in data.values())
     conn.execute(f"INSERT INTO {table} ({columns}) VALUES ({placeholders})", values)
+    conn.commit()
+
+
+def update_record(conn: sqlite3.Connection, table: str, key_col: str, key_val, data: dict) -> None:
+    """Update a record in the database."""
+    set_clause = ", ".join([f"{col} = ?" for col in data.keys()])
+    # Convert all values to native Python types to avoid numpy type issues
+    values = [int(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else v for v in data.values()]
+    values = values + [int(key_val) if isinstance(key_val, (int, float)) and not isinstance(key_val, bool) else key_val]
+    query = f"UPDATE {table} SET {set_clause} WHERE {key_col} = ?"
+    result = conn.execute(query, values)
     conn.commit()
 
 
@@ -60,7 +72,7 @@ def add_user(conn: sqlite3.Connection) -> None:
             insert_record(
                 conn,
                 "USERS",
-                {"Name": name.strip(), "Shortcut": shortcut.strip() or None, "AD_user": ad_user.strip() or None},
+                {"Name": name.strip(), "Shortcut": shortcut.strip() or None, "Network_ID": ad_user.strip() or None},
             )
             st.success("User added.")
 
