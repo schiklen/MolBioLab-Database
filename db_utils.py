@@ -99,11 +99,19 @@ def add_oligo(conn: sqlite3.Connection) -> None:
     next_oligo_number = get_next_available_number(conn, "PRIMERS", "Primer_Number")
 
     with st.form("add_oligo"):
-        primer_number = st.number_input("Oligo Number", min_value=1, step=1, value=next_oligo_number)
-        primer_name = st.text_input("Oligo Name")
+        # First row: Oligo Number (1/8), Oligo Name (5/8), Creator (1/8), Date (1/8)
+        col1, col2, col3, col4 = st.columns([1, 5, 1, 1])
+        with col1:
+            primer_number = st.number_input("Oligo Number", min_value=1, step=1, value=next_oligo_number)
+        with col2:
+            primer_name = st.text_input("Oligo Name")
+        with col3:
+            creator = st.selectbox("Creator", creators, format_func=lambda x: x[1])[0]
+        with col4:
+            created = st.date_input("Date of creation", value=date.today())
+        
+        # Additional fields
         nt_sequence = st.text_area("nt Sequence")
-        creator = st.selectbox("Creator", creators, format_func=lambda x: x[1])[0]
-        created = st.date_input("Date of creation", value=date.today())
         comments = st.text_area("Comments")
         submitted = st.form_submit_button("Save Oligo")
         if submitted:

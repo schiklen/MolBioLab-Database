@@ -46,12 +46,20 @@ if st.session_state.oligo_update_mode and hasattr(st.session_state, 'oligo_dataf
     creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
     
     with st.form("update_oligo"):
-        primer_number = st.number_input("Oligo Number", value=int(selected_row['Primer_Number']), min_value=1, step=1)
-        primer_name = st.text_input("Oligo Name", value=selected_row['Primer_Name'])
+        # First row: Oligo Number (1/8), Oligo Name (5/8), Creator (1/8), Date (1/8)
+        col1, col2, col3, col4 = st.columns([1, 5, 1, 1])
+        with col1:
+            primer_number = st.number_input("Oligo Number", value=int(selected_row['Primer_Number']), min_value=1, step=1)
+        with col2:
+            primer_name = st.text_input("Oligo Name", value=selected_row['Primer_Name'])
+        with col3:
+            creator_id = int(df_full.iloc[selected_idx]['Creator'])  # Convert to Python int
+            creator = st.selectbox("Creator", creators, format_func=lambda x: x[1], index=next(i for i, (cid, _) in enumerate(creators) if cid == creator_id))[0]
+        with col4:
+            created = st.date_input("Date of creation", value=pd.to_datetime(selected_row['Date_of_creation']).date() if selected_row['Date_of_creation'] else date.today(), key="oligo_date")
+        
+        # Additional fields
         nt_sequence = st.text_area("nt Sequence", value=selected_row['nt_Sequence'])
-        creator_id = int(df_full.iloc[selected_idx]['Creator'])  # Convert to Python int
-        creator = st.selectbox("Creator", creators, format_func=lambda x: x[1], index=next(i for i, (cid, _) in enumerate(creators) if cid == creator_id))[0]
-        created = st.date_input("Date of creation", value=pd.to_datetime(selected_row['Date_of_creation']).date() if selected_row['Date_of_creation'] else date.today(), key="oligo_date")
         comments = st.text_area("Comments", value=selected_row['Comments'] if selected_row['Comments'] else "", key="oligo_comments")
         submitted = st.form_submit_button("Update Oligo")
         if submitted:
