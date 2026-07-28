@@ -11,7 +11,7 @@ def show_home() -> None:
 	initialize_database(conn)
 	st.write("Welcome to the Labdatabase.")
 	st.markdown("""
-This is a simple lab database application built with Streamlit and SQLite.
+This is a simple Molecular Biology Lab database application built with Streamlit and SQLite.
 			 """)
 	st.subheader("Page Overview")
 	st.markdown(
@@ -33,7 +33,7 @@ navigation = st.navigation(
 		st.Page("pages/0_Users.py", title="Users"),
 		st.Page("pages/1_Oligos.py", title="Oligos"),
 		st.Page("pages/2_Plasmids.py", title="Plasmids"),
-		st.Page("pages/3_Ecoli_Strains.py", title="E. coli Strains"),
+		st.Page("pages/3_Ecoli_Strains.py", title="*E. coli* Strains"),
 		st.Page("pages/4_Cellbanks.py", title="Cellbanks"),
 	]
 )

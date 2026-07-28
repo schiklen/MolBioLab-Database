@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_oligo, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts, validate_iupac_dna
+from db_utils import add_oligo, get_connection, initialize_database, read_df, update_record, get_user_shortcuts, validate_iupac_dna
 
 st.title("Oligos")
 
