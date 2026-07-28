@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_plasmid, get_connection, initialize_database, read_df, get_lookup_options, update_record
+from db_utils import add_plasmid, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts
 
 st.title("Plasmids")
 
@@ -43,7 +43,7 @@ if st.session_state.update_mode and hasattr(st.session_state, 'plasmid_dataframe
     plasmid_key = int(selected_row['Plasmid_Key'])  # Convert to Python int
     
     st.subheader("Update Plasmid")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     
     with st.form("update_plasmid"):
         plasmid_number = st.number_input("Plasmid Number", value=int(selected_row['Plasmid_Number']), min_value=1, step=1)

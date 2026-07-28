@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_oligo, get_connection, initialize_database, read_df, get_lookup_options, update_record
+from db_utils import add_oligo, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts
 
 st.title("Oligos")
 
@@ -43,7 +43,7 @@ if st.session_state.oligo_update_mode and hasattr(st.session_state, 'oligo_dataf
     primer_key = int(selected_row['Primer_Key'])  # Convert to Python int
     
     st.subheader("Update Oligo")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     
     with st.form("update_oligo"):
         # First row: Oligo Number (1/8), Oligo Name (5/8), Creator (1/8), Date (1/8)

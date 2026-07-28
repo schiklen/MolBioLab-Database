@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_ecoli_strain, get_connection, initialize_database, read_df, get_lookup_options, update_record
+from db_utils import add_ecoli_strain, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts
 
 st.title("_E. coli_ Strains")
 
@@ -43,7 +43,7 @@ if st.session_state.strain_update_mode and hasattr(st.session_state, 'strain_dat
     strain_key = int(selected_row['Ecoli_Strain_Key'])  # Convert to Python int
     
     st.subheader("Update _E. coli_ Strain")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     strains = get_lookup_options(conn, "ECOLI_STRAINS", "Ecoli_Strain_Key", ["Ecoli_Strain_Number", "Ecoli_Strain_Name"])
     
     with st.form("update_strain"):

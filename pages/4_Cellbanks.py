@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_cellbank, get_connection, initialize_database, read_df, get_lookup_options, update_record
+from db_utils import add_cellbank, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts
 
 st.title("Cellbanks")
 
@@ -44,7 +44,7 @@ if st.session_state.cellbank_update_mode and hasattr(st.session_state, 'cellbank
     
     st.subheader("Update Cellbank")
     strains = get_lookup_options(conn, "ECOLI_STRAINS", "Ecoli_Strain_Key", ["Ecoli_Strain_Number", "Ecoli_Strain_Name"])
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     
     with st.form("update_cellbank"):
         strain_id = int(selected_row['Strain'])

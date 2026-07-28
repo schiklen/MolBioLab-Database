@@ -38,6 +38,12 @@ def get_lookup_options(conn: sqlite3.Connection, table: str, key_col: str, label
     return options
 
 
+def get_user_shortcuts(conn: sqlite3.Connection) -> list[tuple[int, str]]:
+    """Get user options with only shortcut as display label."""
+    rows = conn.execute("SELECT User_ID, Shortcut FROM USERS ORDER BY User_ID").fetchall()
+    return [(row[0], row[1] if row[1] else f"User {row[0]}") for row in rows]
+
+
 def get_next_available_number(conn: sqlite3.Connection, table: str, number_col: str) -> int:
     """Get the lowest free integer > 1 for a given table and column."""
     rows = conn.execute(f"SELECT {number_col} FROM {table} ORDER BY {number_col}").fetchall()
@@ -90,7 +96,7 @@ def add_user(conn: sqlite3.Connection) -> None:
 
 def add_oligo(conn: sqlite3.Connection) -> None:
     st.subheader("Add Oligo")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     if not creators:
         st.info("Create at least one user first.")
         return
@@ -135,7 +141,7 @@ def add_oligo(conn: sqlite3.Connection) -> None:
 
 def add_plasmid(conn: sqlite3.Connection) -> None:
     st.subheader("Add Plasmid")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     if not creators:
         st.info("Create at least one user first.")
         return
@@ -172,7 +178,7 @@ def add_plasmid(conn: sqlite3.Connection) -> None:
 
 def add_ecoli_strain(conn: sqlite3.Connection) -> None:
     st.subheader("Add E. coli Strain")
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
     strains = get_lookup_options(conn, "ECOLI_STRAINS", "Ecoli_Strain_Key", ["Ecoli_Strain_Number", "Ecoli_Strain_Name"])
     if not creators:
         st.info("Create at least one user first.")
@@ -210,7 +216,7 @@ def add_ecoli_strain(conn: sqlite3.Connection) -> None:
 def add_cellbank(conn: sqlite3.Connection) -> None:
     st.subheader("Add Cellbank")
     strains = get_lookup_options(conn, "ECOLI_STRAINS", "Ecoli_Strain_Key", ["Ecoli_Strain_Number", "Ecoli_Strain_Name"])
-    creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
+    creators = get_user_shortcuts(conn)
 
     if not strains or not creators:
         st.info("Create users and strains first.")
