@@ -44,6 +44,14 @@ def get_user_shortcuts(conn: sqlite3.Connection) -> list[tuple[int, str]]:
     return [(row[0], row[1] if row[1] else f"User {row[0]}") for row in rows]
 
 
+def validate_iupac_dna(sequence: str) -> bool:
+    """Check if sequence contains only valid IUPAC DNA characters."""
+    if not sequence:
+        return True  # Empty is OK, validation required in form submission
+    iupac_codes = set("ACGTURYWSMKHBDVNacgturywsmkhbdvn")
+    return all(c in iupac_codes for c in sequence)
+
+
 def get_next_available_number(conn: sqlite3.Connection, table: str, number_col: str) -> int:
     """Get the lowest free integer > 1 for a given table and column."""
     rows = conn.execute(f"SELECT {number_col} FROM {table} ORDER BY {number_col}").fetchall()
@@ -117,12 +125,15 @@ def add_oligo(conn: sqlite3.Connection) -> None:
             created = st.date_input("Date of creation", value=date.today())
         
         # Additional fields
-        nt_sequence = st.text_area("nt Sequence")
+        nt_sequence = st.text_input("Sequence", max_chars=120, help="IUPAC DNA characters only (A, C, G, T, U, R, Y, W, S, M, K, H, B, D, V, N)")
         comments = st.text_area("Comments")
         submitted = st.form_submit_button("Save Oligo")
         if submitted:
             if not primer_name.strip() or not nt_sequence.strip():
                 st.error("Oligo name and sequence are required.")
+                return
+            if not validate_iupac_dna(nt_sequence.strip()):
+                st.error("Sequence contains invalid characters. Only IUPAC DNA codes allowed.")
                 return
             insert_record(
                 conn,

@@ -1,6 +1,6 @@
 # Molecular Biology Lab Database
 
-A lightweight database for Microbial Molecular Biology labs based on sqlite and its browser-based user interface python streamlit
+A lightweight database for Microbial Molecular Biology labs based on SQLite and its browser-based user interface Python streamlit
 
 ## Concept
 Molecular biology requires the clear knowledge of whats in the tube, in particular because oligonucleotides, plasmids and bacterial strains usually cannot be distiguished by eye.

@@ -4,7 +4,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 
-from db_utils import add_oligo, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts
+from db_utils import add_oligo, get_connection, initialize_database, read_df, get_lookup_options, update_record, get_user_shortcuts, validate_iupac_dna
 
 st.title("Oligos")
 
@@ -59,12 +59,14 @@ if st.session_state.oligo_update_mode and hasattr(st.session_state, 'oligo_dataf
             created = st.date_input("Date of creation", value=pd.to_datetime(selected_row['Date_of_creation']).date() if selected_row['Date_of_creation'] else date.today(), key="oligo_date")
         
         # Additional fields
-        nt_sequence = st.text_area("nt Sequence", value=selected_row['nt_Sequence'])
+        nt_sequence = st.text_input("Sequence", value=selected_row['nt_Sequence'], max_chars=120, help="IUPAC DNA characters only (A, C, G, T, U, R, Y, W, S, M, K, H, B, D, V, N)")
         comments = st.text_area("Comments", value=selected_row['Comments'] if selected_row['Comments'] else "", key="oligo_comments")
         submitted = st.form_submit_button("Update Oligo")
         if submitted:
             if not primer_name.strip() or not nt_sequence.strip():
                 st.error("Oligo name and sequence are required.")
+            elif not validate_iupac_dna(nt_sequence.strip()):
+                st.error("Sequence contains invalid characters. Only IUPAC DNA codes allowed.")
             else:
                 update_record(
                     conn,
