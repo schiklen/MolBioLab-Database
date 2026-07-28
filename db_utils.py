@@ -132,8 +132,11 @@ def add_plasmid(conn: sqlite3.Connection) -> None:
         st.info("Create at least one user first.")
         return
 
+    # Get the next available plasmid number
+    next_plasmid_number = get_next_available_number(conn, "PLASMIDS", "Plasmid_Number")
+
     with st.form("add_plasmid"):
-        plasmid_number = st.number_input("Plasmid Number", min_value=1, step=1)
+        plasmid_number = st.number_input("Plasmid Number", min_value=1, step=1, value=next_plasmid_number)
         plasmid_name = st.text_input("Plasmid Name")
         dna_sequence = st.text_area("DNA Sequence")
         creator = st.selectbox("Creator", creators, format_func=lambda x: x[1])[0]
@@ -167,8 +170,11 @@ def add_ecoli_strain(conn: sqlite3.Connection) -> None:
         st.info("Create at least one user first.")
         return
 
+    # Get the next available strain number
+    next_strain_number = get_next_available_number(conn, "ECOLI_STRAINS", "Ecoli_Strain_Number")
+
     with st.form("add_strain"):
-        strain_number = st.number_input("Strain Number", min_value=1, step=1)
+        strain_number = st.number_input("Strain Number", min_value=1, step=1, value=next_strain_number)
         strain_name = st.text_input("Strain Name")
         parent = st.selectbox("Parent strain", [(None, "None")] + strains, format_func=lambda x: x[1])[0]
         genotype = st.text_area("Genotype")

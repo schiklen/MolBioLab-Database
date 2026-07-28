@@ -42,7 +42,7 @@ if st.session_state.strain_update_mode and hasattr(st.session_state, 'strain_dat
     selected_row = df.iloc[selected_idx]
     strain_key = int(selected_row['Ecoli_Strain_Key'])  # Convert to Python int
     
-    st.subheader("Update E. coli Strain")
+    st.subheader("Update _E. coli_ Strain")
     creators = get_lookup_options(conn, "USERS", "User_ID", ["Name"])
     strains = get_lookup_options(conn, "ECOLI_STRAINS", "Ecoli_Strain_Key", ["Ecoli_Strain_Number", "Ecoli_Strain_Name"])
     
